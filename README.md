@@ -2,7 +2,7 @@
 
 An end-to-end machine learning pipeline built on the classic Titanic dataset — covering data cleaning, exploratory data analysis, multivariate storytelling, classification, class-imbalance handling, hyperparameter tuning, regression, and model persistence, all wrapped in a single reproducible notebook.
 
-This project was built to demonstrate production-style ML workflow habits: leakage-safe preprocessing, justified data-cleaning decisions, multi-model benchmarking, and a saved, reloadable inference pipeline, not just a notebook of disconnected plots.
+This project was built to demonstrate production-style ML workflow habits: leakage-safe preprocessing, justified data-cleaning decisions, multi-model benchmarking, and a saved, reloadable inference pipeline — not just a notebook of disconnected plots.
 
 ---
 
@@ -10,7 +10,7 @@ This project was built to demonstrate production-style ML workflow habits: leaka
 
 - **Leakage-free preprocessing** : all imputation, scaling, and encoding are fit exclusively on training data inside `sklearn` Pipelines, never on the full dataset.
 - **Justified missing-data strategy** : every column's missing-value treatment (drop rows / impute / drop column) is decided programmatically based on missingness thresholds (< 5%, 5–30%, > 30%).
-- **Three benchmarked classifiers**  Logistic Regression, Decision Tree, and Random Forest compared on Accuracy, Precision, Recall, F1, and ROC-AUC.
+- **Three benchmarked classifiers** : Logistic Regression, Decision Tree, and Random Forest compared on Accuracy, Precision, Recall, F1, and ROC-AUC.
 - **Class imbalance handling** : baseline vs. `class_weight="balanced"` vs. SMOTE oversampling, compared fairly (SMOTE applied only to training folds).
 - **Hyperparameter tuning** : `GridSearchCV` (5-fold CV, F1-optimized) over Random Forest depth, estimators, and feature sampling, with out-of-bag (OOB) score reported.
 - **Regression side-task** : a multivariate Linear Regression model predicting `fare`, evaluated with MAE, RMSE, R², and Adjusted R², including residual diagnostics for heteroscedasticity.
@@ -69,40 +69,95 @@ A rules-based strategy determines the treatment for every column:
 ### 3. Bivariate & Correlation Analysis
 Survival rates are broken down by sex, passenger class, and their combination using boolean masking, alongside a 6×6 correlation matrix (`survived`, `pclass`, `age`, `sibsp`, `parch`, `fare`) visualized as a heatmap.
 
+![Correlation Heatmap](charts/correlation_heatmap.png)
+
+The strongest relationships: **pclass and fare** are negatively correlated (-0.55, higher class number means lower fare), and **survived and pclass** are also negatively correlated (-0.34) first-class passengers survived at noticeably higher rates.
+
 ### 4. Multivariate Data Story
-Four narrative-driven charts explore survival through the combined lens of sex, class, age, fare, and family size  each with a written interpretation.
+
+**Survival by Sex & Class** : women survived at dramatically higher rates than men across every class, and survival for both sexes improves in higher classes:
+
+![Survival by Sex and Class](charts/survival_sex_class.png)
+
+**Age Distribution by Survival & Sex** : age distributions of survivors and non-survivors overlap substantially, meaning age alone is a weak predictor without other context:
+
+![Age Distribution](charts/survival_age.png)
+
+**Fare Distribution by Class & Survival** : fare is closely tied to class, and survivors are concentrated among higher-fare passengers, especially in first class:
+
+![Fare Distribution](charts/fare_survival.png)
+
+**Survival by Family Size & Sex** : survival doesn't increase monotonically with family size; small-to-mid-sized families fare better than solo travelers or very large groups:
+
+![Family Survival](charts/family_survival.png)
 
 ### 5. Train/Test Split & Preprocessing
-A stratified 80/20 split preserves class proportions. Numeric features are median-imputed and scaled; categorical features are mode-imputed and one-hot encoded all inside a `ColumnTransformer` fit only on training data.
+A stratified 80/20 split preserves class proportions. Numeric features are median-imputed and scaled; categorical features are mode-imputed and one-hot encoded — all inside a `ColumnTransformer` fit only on training data.
 
 ### 6. Classification Modeling
-Three classifiers (Logistic Regression, Decision Tree, Random Forest) are trained inside identical preprocessing pipelines and evaluated on held-out test data with confusion matrices and ROC curves.
+Three classifiers (Logistic Regression, Decision Tree, Random Forest) are trained inside identical preprocessing pipelines and evaluated on held-out test data.
+
+![Decision Tree](charts/decision_tree.png)
+
+**Confusion Matrices**
+
+| Logistic Regression | Decision Tree | Random Forest |
+|---|---|---|
+| ![LR CM](charts/logistic_regression_confusion_matrix.png) | ![DT CM](charts/decision_tree_confusion_matrix.png) | ![RF CM](charts/random_forest_confusion_matrix.png) |
+
+**ROC Curves**
+
+![ROC Curves](charts/roc_curves.png)
 
 ### 7. Class Imbalance Handling
-Compares three strategies baseline, class-weight balancing, and SMOTE oversampling — on Precision, Recall, and F1 to identify the best trade-off for the minority class.
+Three strategies were compared on the Logistic Regression model baseline, `class_weight="balanced"`, and SMOTE oversampling (fit only on training folds, never on test data):
+
+| Strategy | Precision | Recall | F1 |
+|---|---|---|---|
+| Baseline | 0.783 | 0.691 | 0.734 |
+| Class Weight Balanced | 0.718 | 0.750 | 0.734 |
+| SMOTE | 0.735 | 0.735 | 0.735 |
+
+All three strategies land within a hair of each other on F1 (~0.734), but they trade precision for recall differently. The baseline is most precise when it predicts survival; class weighting catches the most true survivors (highest recall); SMOTE lands right in between with the most balanced precision/recall split.
 
 ### 8. Hyperparameter Tuning
 `GridSearchCV` tunes the Random Forest across estimators, depth, and feature sampling strategy using 5-fold cross-validation optimized for F1, with OOB score reported as an additional validation signal.
 
 ### 9. Regression Side-Task
-A separate Linear Regression model predicts `fare` from passenger attributes, evaluated with MAE, RMSE, R², and Adjusted R², plus a residual plot to check for heteroscedasticity.
+A Linear Regression model predicts `fare` from passenger attributes (class, age, family size, sex, embarkation port, and survival status):
+
+| Model | MAE | RMSE | R² | Adjusted R² |
+|---|---|---|---|---|
+| Multiple Linear Regression | 21.10 | 41.70 | 0.348 | 0.309 |
+
+The model explains about **35% of the variance** in fare expected, since fare in this era was driven heavily by cabin/berth specifics not captured in these features. The residual plot below shows increasing spread at higher predicted fares, consistent with mild heteroscedasticity:
+
+![Residuals](charts/regression_residuals.png)
 
 ### 10. Final Comparison & Model Persistence
 All classification and regression metrics are consolidated into a single comparison table. The best-performing pipeline is saved with `joblib` and reloaded to confirm it reproduces identical predictions directly from raw input proving the artifact is deployment-ready.
 
 ---
 
-## 📊 Example Results
+## 📊 Final Results
 
-> Exact values are generated at runtime and saved to `outputs/model_comparison.csv`. Typical performance on this dataset looks like:
+**Classification** (test set, from `outputs/model_comparison.csv`):
 
 | Model | Accuracy | Precision | Recall | F1 | AUC |
 |---|---|---|---|---|---|
-| Logistic Regression | ~0.80 | ~0.77 | ~0.72 | ~0.74 | ~0.85 |
-| Decision Tree | ~0.79 | ~0.76 | ~0.70 | ~0.73 | ~0.82 |
-| Random Forest (tuned) | ~0.82 | ~0.79 | ~0.75 | ~0.77 | ~0.87 |
+| Logistic Regression | 0.809 | 0.783 | 0.691 | 0.734 | **0.861** |
+| Decision Tree | 0.809 | **0.815** | 0.647 | 0.721 | 0.856 |
+| Random Forest | 0.809 | 0.766 | **0.721** | **0.742** | 0.820 |
 
-Key takeaway: **sex, passenger class, and fare** are the strongest predictors of survival, while age alone shows limited discriminative power without multivariate context.
+All three models converge on ~81% accuracy, but differ in trade-offs: **Decision Tree** is the most precise when predicting survival, **Random Forest** catches the most true survivors (best recall and F1), and **Logistic Regression** has the strongest overall class separation (best AUC) making it the most reliable, interpretable baseline for this dataset.
+
+**Regression** (predicting fare):
+
+| Model | MAE | RMSE | R² | Adjusted R² |
+|---|---|---|---|---|
+| Multiple Linear Regression | 21.10 | 41.70 | 0.348 | 0.309 |
+
+**Key takeaway:** sex, passenger class, and fare are the strongest predictors of survival, while age alone shows limited discriminative power without multivariate context.
 
 ---
 
