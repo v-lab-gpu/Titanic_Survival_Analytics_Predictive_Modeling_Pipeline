@@ -1,8 +1,8 @@
 # 🚢 Titanic Survival Analytics & Predictive Modeling Pipeline
 
-An end-to-end machine learning pipeline built on the classic Titanic dataset — covering data cleaning, exploratory data analysis, multivariate storytelling, classification, class-imbalance handling, hyperparameter tuning, regression, and model persistence, all wrapped in a single reproducible notebook.
+An end-to-end machine learning pipeline built on the classic Titanic dataset covering data cleaning, exploratory data analysis, multivariate storytelling, classification, class-imbalance handling, hyperparameter tuning, regression, and model persistence, all wrapped in a single reproducible notebook.
 
-This project was built to demonstrate production-style ML workflow habits: leakage-safe preprocessing, justified data-cleaning decisions, multi-model benchmarking, and a saved, reloadable inference pipeline — not just a notebook of disconnected plots.
+This project was built to demonstrate production-style ML workflow habits: leakage-safe preprocessing, justified data-cleaning decisions, multi-model benchmarking, and a saved, reloadable inference pipeline not just a notebook of disconnected plots.
 
 ---
 
@@ -92,7 +92,7 @@ The strongest relationships: **pclass and fare** are negatively correlated (-0.5
 ![Family Survival](charts/family_survival.png)
 
 ### 5. Train/Test Split & Preprocessing
-A stratified 80/20 split preserves class proportions. Numeric features are median-imputed and scaled; categorical features are mode-imputed and one-hot encoded — all inside a `ColumnTransformer` fit only on training data.
+A stratified 80/20 split preserves class proportions. Numeric features are median-imputed and scaled; categorical features are mode-imputed and one-hot encoded all inside a `ColumnTransformer` fit only on training data.
 
 ### 6. Classification Modeling
 Three classifiers (Logistic Regression, Decision Tree, Random Forest) are trained inside identical preprocessing pipelines and evaluated on held-out test data.
