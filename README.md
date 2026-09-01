@@ -2,19 +2,19 @@
 
 An end-to-end machine learning pipeline built on the classic Titanic dataset — covering data cleaning, exploratory data analysis, multivariate storytelling, classification, class-imbalance handling, hyperparameter tuning, regression, and model persistence, all wrapped in a single reproducible notebook.
 
-This project was built to demonstrate production-style ML workflow habits: leakage-safe preprocessing, justified data-cleaning decisions, multi-model benchmarking, and a saved, reloadable inference pipeline — not just a notebook of disconnected plots.
+This project was built to demonstrate production-style ML workflow habits: leakage-safe preprocessing, justified data-cleaning decisions, multi-model benchmarking, and a saved, reloadable inference pipeline, not just a notebook of disconnected plots.
 
 ---
 
 ## 📌 Project Highlights
 
-- **Leakage-free preprocessing** — all imputation, scaling, and encoding are fit exclusively on training data inside `sklearn` Pipelines, never on the full dataset.
-- **Justified missing-data strategy** — every column's missing-value treatment (drop rows / impute / drop column) is decided programmatically based on missingness thresholds (< 5%, 5–30%, > 30%).
-- **Three benchmarked classifiers** — Logistic Regression, Decision Tree, and Random Forest compared on Accuracy, Precision, Recall, F1, and ROC-AUC.
-- **Class imbalance handling** — baseline vs. `class_weight="balanced"` vs. SMOTE oversampling, compared fairly (SMOTE applied only to training folds).
-- **Hyperparameter tuning** — `GridSearchCV` (5-fold CV, F1-optimized) over Random Forest depth, estimators, and feature sampling, with out-of-bag (OOB) score reported.
-- **Regression side-task** — a multivariate Linear Regression model predicting `fare`, evaluated with MAE, RMSE, R², and Adjusted R², including residual diagnostics for heteroscedasticity.
-- **Model persistence** — the best-performing complete pipeline (preprocessing + estimator) is serialized with `joblib` and verified to reproduce identical predictions on raw, unprocessed input after reloading.
+- **Leakage-free preprocessing** : all imputation, scaling, and encoding are fit exclusively on training data inside `sklearn` Pipelines, never on the full dataset.
+- **Justified missing-data strategy** : every column's missing-value treatment (drop rows / impute / drop column) is decided programmatically based on missingness thresholds (< 5%, 5–30%, > 30%).
+- **Three benchmarked classifiers**  Logistic Regression, Decision Tree, and Random Forest compared on Accuracy, Precision, Recall, F1, and ROC-AUC.
+- **Class imbalance handling** : baseline vs. `class_weight="balanced"` vs. SMOTE oversampling, compared fairly (SMOTE applied only to training folds).
+- **Hyperparameter tuning** : `GridSearchCV` (5-fold CV, F1-optimized) over Random Forest depth, estimators, and feature sampling, with out-of-bag (OOB) score reported.
+- **Regression side-task** : a multivariate Linear Regression model predicting `fare`, evaluated with MAE, RMSE, R², and Adjusted R², including residual diagnostics for heteroscedasticity.
+- **Model persistence** : the best-performing complete pipeline (preprocessing + estimator) is serialized with `joblib` and verified to reproduce identical predictions on raw, unprocessed input after reloading.
 
 ---
 
@@ -70,16 +70,16 @@ A rules-based strategy determines the treatment for every column:
 Survival rates are broken down by sex, passenger class, and their combination using boolean masking, alongside a 6×6 correlation matrix (`survived`, `pclass`, `age`, `sibsp`, `parch`, `fare`) visualized as a heatmap.
 
 ### 4. Multivariate Data Story
-Four narrative-driven charts explore survival through the combined lens of sex, class, age, fare, and family size — each with a written interpretation.
+Four narrative-driven charts explore survival through the combined lens of sex, class, age, fare, and family size  each with a written interpretation.
 
 ### 5. Train/Test Split & Preprocessing
-A stratified 80/20 split preserves class proportions. Numeric features are median-imputed and scaled; categorical features are mode-imputed and one-hot encoded — all inside a `ColumnTransformer` fit only on training data.
+A stratified 80/20 split preserves class proportions. Numeric features are median-imputed and scaled; categorical features are mode-imputed and one-hot encoded all inside a `ColumnTransformer` fit only on training data.
 
 ### 6. Classification Modeling
 Three classifiers (Logistic Regression, Decision Tree, Random Forest) are trained inside identical preprocessing pipelines and evaluated on held-out test data with confusion matrices and ROC curves.
 
 ### 7. Class Imbalance Handling
-Compares three strategies — baseline, class-weight balancing, and SMOTE oversampling — on Precision, Recall, and F1 to identify the best trade-off for the minority class.
+Compares three strategies baseline, class-weight balancing, and SMOTE oversampling — on Precision, Recall, and F1 to identify the best trade-off for the minority class.
 
 ### 8. Hyperparameter Tuning
 `GridSearchCV` tunes the Random Forest across estimators, depth, and feature sampling strategy using 5-fold cross-validation optimized for F1, with OOB score reported as an additional validation signal.
@@ -88,7 +88,7 @@ Compares three strategies — baseline, class-weight balancing, and SMOTE oversa
 A separate Linear Regression model predicts `fare` from passenger attributes, evaluated with MAE, RMSE, R², and Adjusted R², plus a residual plot to check for heteroscedasticity.
 
 ### 10. Final Comparison & Model Persistence
-All classification and regression metrics are consolidated into a single comparison table. The best-performing pipeline is saved with `joblib` and reloaded to confirm it reproduces identical predictions directly from raw input — proving the artifact is deployment-ready.
+All classification and regression metrics are consolidated into a single comparison table. The best-performing pipeline is saved with `joblib` and reloaded to confirm it reproduces identical predictions directly from raw input proving the artifact is deployment-ready.
 
 ---
 
@@ -138,7 +138,7 @@ The notebook is self-contained: it creates its own `charts/` and `outputs/` dire
 
 ## 📄 License
 
-This project is available under the MIT License — feel free to fork, adapt, and build on it.
+This project is available under the MIT License, feel free to fork, adapt, and build on it.
 
 ---
 
